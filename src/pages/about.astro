@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
+---
+
+<BaseLayout title="关于" description="关于我">
+  <article class="about prose">
+    <h1>关于</h1>
+    <p>这里是你的自我介绍。你可以写：</p>
+    <ul>
+      <li>你是谁，做什么工作的</li>
+      <li>这个博客主要写什么</li>
+      <li>你希望读者从这里获得什么</li>
+      <li>你的联系方式 / 社交账号</li>
+    </ul>
+
+    <h2>联系方式</h2>
+    <ul>
+      {SITE.social.xhs && <li>小红书：<a href={SITE.social.xhs} target="_blank" rel="noopener">{SITE.social.xhs}</a></li>}
+      {SITE.social.email && <li>邮箱：<a href={`mailto:${SITE.social.email}`}>{SITE.social.email}</a></li>}
+      {SITE.social.weibo && <li>微博：<a href={SITE.social.weibo} target="_blank" rel="noopener">{SITE.social.weibo}</a></li>}
+    </ul>
+
+    <hr />
+
+    <h2>📝 如何发布文章</h2>
+    <p>详细说明请看：<a href="/admin-guide">发布文章指南</a></p>
+    <p><strong>最简流程（3 步）：</strong></p>
+    <ol>
+      <li>打开博客仓库的 <code>src/content/posts/对应分类/</code> 目录</li>
+      <li>点 <code>Add file → Create new file</code>，粘贴你的 Markdown 内容</li>
+      <li>点 <code>Commit changes</code>，等 2 分钟自动上线</li>
+    </ol>
+  </article>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: var(--max-w);
+  }
+  .about h1 {
+    font-size: 2rem;
+    margin-top: 0;
+  }
+</style>

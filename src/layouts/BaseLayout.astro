@@ -1,0 +1,137 @@
+---
+import { SITE } from '../consts';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  ogImage,
+} = Astro.props;
+
+const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="site-title">{SITE.title}</a>
+        <nav class="site-nav">
+          <a href="/categories/nutrition">营养</a>
+          <a href="/categories/tools">工具</a>
+          <a href="/categories/money">财务</a>
+          <a href="/about">关于</a>
+          <a href="/rss.xml">RSS</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p class="muted">
+          © {new Date().getFullYear()} {SITE.author}. All rights reserved.
+        </p>
+        <p class="muted footer-links">
+          <a href="/rss.xml">RSS</a>
+          {' · '}
+          <a href="/sitemap-index.xml">Sitemap</a>
+          {' · '}
+          <a href="/about">关于</a>
+        </p>
+      </div>
+    </footer>
+
+    <style>
+      .site-header {
+        border-bottom: 1px solid var(--border);
+        padding: 1.5em 0;
+        margin-bottom: 3em;
+      }
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1em;
+      }
+      .site-title {
+        font-weight: 700;
+        font-size: 1.15rem;
+        border-bottom: none !important;
+      }
+      .site-nav {
+        display: flex;
+        gap: 1.4em;
+        font-size: 0.95rem;
+        flex-wrap: wrap;
+      }
+      .site-nav a {
+        color: var(--text-soft);
+        border-bottom: none;
+      }
+      .site-nav a:hover {
+        color: var(--text);
+      }
+      main {
+        min-height: calc(100vh - 220px);
+        padding-bottom: 3em;
+      }
+      .site-footer {
+        border-top: 1px solid var(--border);
+        padding: 2em 0;
+        margin-top: 4em;
+        font-size: 0.9em;
+      }
+      .footer-links {
+        margin-top: 0.5em;
+      }
+      @media (max-width: 640px) {
+        .header-inner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.8em;
+        }
+        .site-nav { font-size: 0.9rem; gap: 1em; }
+      }
+    </style>
+  </body>
+</html>

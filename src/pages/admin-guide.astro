@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CATEGORIES } from '../consts';
+---
+
+<BaseLayout title="发布文章指南" description="如何在这个博客发布新文章">
+  <article class="guide prose">
+    <h1>📝 发布文章指南</h1>
+    <p class="muted">
+      这是一份给"完全没接触过代码"的人看的指南。整个发布流程只需要 <strong>3 步</strong>，全程用浏览器，不用装任何软件。
+    </p>
+
+    <h2>三种发布方式</h2>
+    <p>按推荐程度排序：</p>
+
+    <h3>方式 1：GitHub 网页直接编辑（最简单 ⭐）</h3>
+    <ol>
+      <li>打开你的博客仓库（部署后会给一个 GitHub 链接）</li>
+      <li>点 <code>src/content/posts/对应分类/</code> 文件夹，比如 <code>nutrition/</code></li>
+      <li>点右上角 <code>Add file</code> → <code>Create new file</code></li>
+      <li>文件名以 <code>.md</code> 结尾，比如 <code>2026-06-09-早餐搭配指南.md</code></li>
+      <li>把下面的"文章模板"粘进去，填好标题、日期、分类</li>
+      <li>写完正文的 Markdown 内容</li>
+      <li>滚到底部，点绿色的 <code>Commit changes</code> 按钮</li>
+      <li>等 1-2 分钟，博客自动更新</li>
+    </ol>
+
+    <h3>方式 2：本地用 Markdown 编辑器写</h3>
+    <p>推荐下载一个免费的 <strong>MarkText</strong>（所见即所得，跟 Word 一样用）：</p>
+    <ul>
+      <li>下载：<a href="https://marktext.app/" target="_blank" rel="noopener">marktext.app</a></li>
+      <li>写完后把 <code>.md</code> 文件保存到对应分类目录</li>
+      <li>用 GitHub Desktop（图形化工具）一键推送</li>
+    </ul>
+
+    <h3>方式 3：小红书内容同步</h3>
+    <p>把小红书的图文内容整理成博客文章。流程：</p>
+    <ol>
+      <li>从小红书 App 复制你要同步的图文（长按 → 复制）</li>
+      <li>用我提供的格式化脚本（<code>scripts/xhs-to-md.py</code>）转成 Markdown</li>
+      <li>手动粘到博客对应分类目录，frontmatter 加上 <code>source: 小红书</code></li>
+    </ol>
+
+    <hr />
+
+    <h2>文章模板</h2>
+    <p>每篇文章的开头要有一段这样的"前置信息"（叫 frontmatter）：</p>
+    <pre><code>---
+title: 你的文章标题
+description: 一句话简介（会显示在列表页和搜索结果）
+pubDatetime: 2026-06-09
+category: nutrition  # 必须是下面这5个之一
+tags: [早餐, 蛋白质]
+source: 小红书  # 可选，标注来源
+draft: false  # true 表示草稿，不会发布
+---
+
+# 你的文章标题
+
+从这里开始写正文。
+支持 Markdown 语法：
+- **加粗** 和 *斜体*
+- [链接](https://example.com)
+- 图片：![描述](/images/photo.jpg)
+- 列表、引用、代码块、表格都可以</code></pre>
+
+    <h2>5 个分类及说明</h2>
+    <ul>
+      {Object.entries(CATEGORIES).map(([key, cat]) => (
+        <li>
+          <strong style={`color: ${cat.color};`}>{cat.label}</strong> (category: <code>{key}</code>) — {cat.desc}
+        </li>
+      ))}
+    </ul>
+
+    <h2>图片怎么放</h2>
+    <ol>
+      <li>在仓库里点 <code>public/images/</code> 文件夹</li>
+      <li>点 <code>Add file → Upload files</code>，把图片拖进去</li>
+      <li>在文章里这样引用：<code>![说明](/images/你的文件名.jpg)</code></li>
+    </ol>
+    <p class="muted">
+      💡 图片也可以用外链（微博图床、七牛、Cloudflare R2 等），等博客访问量大了再考虑换图床。
+    </p>
+
+    <h2>常见问题</h2>
+    <p><strong>Q：改了一篇文章能直接提交吗？</strong></p>
+    <p>A：可以。打开对应文件，点右上角铅笔图标 ✏️ 编辑，改完点 Commit。</p>
+
+    <p><strong>Q：怎么让文章变成"草稿"不发布？</strong></p>
+    <p>A：在 frontmatter 里加 <code>draft: true</code>。</p>
+
+    <p><strong>Q：分类写错了会怎样？</strong></p>
+    <p>A：网站会报错。必须是 <code>nutrition / reading / tools / money / life</code> 这5个之一。</p>
+
+    <p><strong>Q：怎么删除一篇文章？</strong></p>
+    <p>A：打开文件，点右上角 🗑️ 图标。</p>
+
+    <hr />
+
+    <p class="muted">
+      还有问题？<a href="/about">联系我</a> 或者直接问 AI 助手。
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .guide {
+    max-width: var(--max-w);
+  }
+  .guide h1 {
+    font-size: 2rem;
+    margin-top: 0;
+  }
+  .guide h2 {
+    font-size: 1.4rem;
+    margin-top: 2em;
+  }
+  .guide h3 {
+    font-size: 1.1rem;
+    margin-top: 1.5em;
+    color: var(--text-soft);
+  }
+  .guide pre {
+    margin: 1em 0;
+  }
+  .guide code {
+    font-size: 0.88em;
+  }
+</style>

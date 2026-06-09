@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '../consts';
+import { formatDateShort } from '../utils/date';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime());
+
+// 按年份分组
+const byYear = posts.reduce((acc, post) => {
+  const year = post.data.pubDatetime.getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {} as Record<number, typeof posts>);
+
+const years = Object.keys(byYear)
+  .map(Number)
+  .sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="所有文章列表">
+  <section class="archive-header">
+    <a href="/" class="back muted">← 返回首页</a>
+    <h1>归档</h1>
+    <p class="muted">共 {posts.length} 篇文章</p>
+  </section>
+
+  {years.map((year) => (
+    <section class="year-section">
+      <h2 class="year-title">{year}</h2>
+      <ul class="post-list">
+        {byYear[year].map((post) => {
+          const cat = CATEGORIES[post.data.category];
+          return (
+            <li class="post-item">
+              <a href={`/posts/${post.id}`} class="post-link">
+                <time class="post-date muted">{formatDateShort(post.data.pubDatetime)}</time>
+                <span class="post-title-sm">{post.data.title}</span>
+                <span class="cat-tag muted" style={`color: ${cat.color};`}>
+                  {cat.label}
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .archive-header {
+    margin-bottom: 2.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var(--border);
+  }
+  .back {
+    display: inline-block;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+    border-bottom: none;
+  }
+  .archive-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  .year-section {
+    margin-bottom: 2.5em;
+  }
+  .year-title {
+    font-size: 1.4rem;
+    margin: 1.5em 0 1em;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .post-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .post-item:last-child {
+    border-bottom: none;
+  }
+  .post-link {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    align-items: baseline;
+    gap: 1em;
+    padding: 1em 0;
+    border-bottom: none !important;
+  }
+  .post-link:hover .post-title-sm {
+    color: var(--accent);
+  }
+  .post-date {
+    font-size: 0.85em;
+    font-variant-numeric: tabular-nums;
+  }
+  .post-title-sm {
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .cat-tag {
+    font-size: 0.85em;
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .post-link {
+      grid-template-columns: auto 1fr;
+      gap: 0.8em;
+    }
+    .post-date {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

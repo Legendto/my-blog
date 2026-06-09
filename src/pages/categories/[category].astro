@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CATEGORIES, type CategoryKey } from '../../consts';
+import { formatDateShort } from '../../utils/date';
+
+export async function getStaticPaths() {
+  return Object.keys(CATEGORIES).map((key) => ({
+    params: { category: key },
+    props: { category: key as CategoryKey },
+  }));
+}
+
+interface Props {
+  category: CategoryKey;
+}
+
+const { category } = Astro.props;
+const catInfo = CATEGORIES[category];
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
+  .sort((a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime());
+---
+
+<BaseLayout
+  title={catInfo.label}
+  description={catInfo.desc}
+>
+  <section class="cat-header">
+    <a href="/" class="back muted">← 返回首页</a>
+    <h1 style={`color: ${catInfo.color};`}>{catInfo.label}</h1>
+    <p class="muted">{catInfo.desc}</p>
+    <p class="muted cat-count">共 {posts.length} 篇</p>
+  </section>
+
+  {posts.length === 0 ? (
+    <p class="muted">这个分类还没有文章。</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li class="post-item">
+          <a href={`/posts/${post.id}`} class="post-link">
+            <div class="post-row">
+              <h3 class="post-title-sm">{post.data.title}</h3>
+              <time class="post-date muted">{formatDateShort(post.data.pubDatetime)}</time>
+            </div>
+            {post.data.description && (
+              <p class="post-desc-sm muted">{post.data.description}</p>
+            )}
+            {post.data.tags.length > 0 && (
+              <div class="tags">
+                {post.data.tags.slice(0, 4).map((tag) => (
+                  <span class="tag">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>
+
+<style>
+  .cat-header {
+    margin-bottom: 2.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var(--border);
+  }
+  .back {
+    display: inline-block;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+    border-bottom: none;
+  }
+  .cat-header h1 {
+    margin: 0 0 0.3em;
+    font-size: 1.8rem;
+  }
+  .cat-count {
+    margin-top: 0.8em;
+    font-size: 0.9em;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .post-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .post-item:last-child {
+    border-bottom: none;
+  }
+  .post-link {
+    display: block;
+    padding: 1.4em 0;
+    border-bottom: none !important;
+  }
+  .post-link:hover .post-title-sm {
+    color: var(--accent);
+  }
+  .post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1em;
+    margin-bottom: 0.4em;
+  }
+  .post-title-sm {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    transition: color 0.15s;
+  }
+  .post-date {
+    font-size: 0.85em;
+    white-space: nowrap;
+  }
+  .post-desc-sm {
+    margin: 0 0 0.6em;
+    font-size: 0.95em;
+  }
+  .tags {
+    margin-top: 0.5em;
+  }
+  @media (max-width: 640px) {
+    .post-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2em;
+    }
+  }
+</style>
